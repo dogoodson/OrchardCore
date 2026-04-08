@@ -18,11 +18,8 @@ jobs:
       with:
         dotnet-version: '10.0.x'
 
-    - name: Restore dependencies
-      run: dotnet restore
-
-    - name: Build
-      run: dotnet build --no-restore --configuration Release
+    - name: Restore & Build
+      run: dotnet build --configuration Release
 
     # Scan dependencies for vulnerabilities
     - name: Check for Vulnerable Packages
