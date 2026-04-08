@@ -1,0 +1,39 @@
+name: .NET Core Security Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+
+    # Scan dependencies for vulnerabilities
+    - name: Check for Vulnerable Packages
+      run: dotnet list package --vulnerable --include-transitive
+      
+    # Optionally: Fail the build if vulnerabilities are found
+    - name: Fail on Critical Vulnerabilities
+      run: |
+        if dotnet list package --vulnerable --include-transitive | grep -q "has a vulnerability"; then
+          echo "Critical vulnerabilities found!"
+          exit 1
+        else
+          echo "No critical vulnerabilities found."
+        fi
